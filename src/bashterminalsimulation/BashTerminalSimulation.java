@@ -9,8 +9,7 @@ import java.util.Scanner;
  */
 public class BashTerminalSimulation {
 
-    
-    
+
     /**
      * Main method, used for reading and handling user input.
      */
@@ -19,8 +18,11 @@ public class BashTerminalSimulation {
         boolean isRunning=true;
         Scanner input = new Scanner(System.in);
         String command;
+        printCommands();
         while(isRunning){
-            printCommands();
+            
+            System.out.print("[user@localhost]: $");
+            
             command = input.nextLine();
             if(command.equals("exit")){
                 isRunning=false;
@@ -34,13 +36,19 @@ public class BashTerminalSimulation {
             else if(command.equals("ls -R")){
                 tree.printDirectoryTree();
             }
-            
+            else if(command.substring(0,2).equals("cd") && command.substring(3).equals("..")){
+                tree.moveUp();
+            }
             else if(command.substring(0,2).equals("cd")){
                 tree.changeDirectory(command.substring(3));
             }
             
             else if(command.substring(0,5).equals("mkdir")){
                 tree.makeDirectory(command.substring(6));
+            }
+            
+            else if(command.substring(0,4).equals("find")){
+                System.out.println(tree.find(command.substring(5)));
             }
             
             else if(command.substring(0,5).equals("touch")){
@@ -74,9 +82,12 @@ public class BashTerminalSimulation {
                 + "brackets not required)");
         System.out.println("touch {name} (make a file with some name, brackets "
                 + "not required)");
-        System.out.println("exit (terminates program)");
-        System.out.println("Enter command: ");
-        System.out.print("[user@localhost]: $");
+        System.out.println("find {name} (searches tree for node of same name, "
+                + "and prints path)");
+        System.out.println("cd .. (Moves the cursor up to its parent directory, "
+                + "and has no effect at root)");
+        System.out.println("exit (terminates program)");   
+        
     }
     
 }

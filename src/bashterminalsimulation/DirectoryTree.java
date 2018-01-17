@@ -70,6 +70,20 @@ public class DirectoryTree {
     }
     
     /**
+     * Finds the path for the node with the given name, and returns it as a 
+     * String
+     * 
+     * @param nodeName
+     * The name of the node to be found in the tree
+     * 
+     * @return 
+     * A formatted String with the path of the node
+     */
+    public String find(String nodeName){
+        return presentWorkingDirectoryHelper(root,"",nodeName);
+    }
+    
+    /**
      * Returns a String showing the present working directory, which is the path
      * of directories starting from the root and ending at the cursor.
      * 
@@ -81,60 +95,112 @@ public class DirectoryTree {
             System.out.println("No files exist.");
             return "";
         }
-        return presentWorkingDirectoryHelper(root,"");
+        return presentWorkingDirectoryHelper(root,"",cursor.getName());
     }
     
     /**
-     * A recursive helper method for getting the present working directory.
+     * A recursive helper method for getting the present working directory and 
+     * finding a certain node.
      * 
      * @param node
      * Current node in the tree. 
      * 
-     * @param s
+     * @param path
      * A String holding the values of different places visited in the tree thus 
      * far.
+     * 
+     * @param nameToFind
+     * A String containing the name of the node we're searching for
      * 
      * @return 
      * A formatted String displaying the present working directory.
      */
-    private String presentWorkingDirectoryHelper(DirectoryNode node, String s){
+    private String presentWorkingDirectoryHelper(DirectoryNode node, 
+            String path, String nameToFind){
 
         //we use space as a token to see if we've found the cursor node
-        if(s.contains(" ")){
-            return s;
+        if(path.contains(" ")){
+            return path;
         }
         if(node==null){
             return null;
         }
         
-        if(node.getName().equals(cursor.getName())){
-            return s+node.getName() + " ";
+        if(node.getName().equals(nameToFind)){
+            return path+node.getName() + " ";
         }else{
-            s+=node.getName()+"/"; 
+            path+=node.getName()+"/"; 
             
             String l, m, r;
         if(node.getLeft()!=null && !node.getLeft().getIsFile()){
-                l=presentWorkingDirectoryHelper(node.getLeft(), s);
+                l=presentWorkingDirectoryHelper(node.getLeft(), path, 
+                        nameToFind);
                 if(l.contains(" ")){
                     return l;
                 }
         }
         if(node.getMiddle()!=null && !node.getMiddle().getIsFile()){
             
-            m = presentWorkingDirectoryHelper(node.getMiddle(), s);
+            m = presentWorkingDirectoryHelper(node.getMiddle(), path, 
+                    nameToFind);
             if(m.contains(" ")){
                 return m;
             }
         }
         if(node.getRight()!=null && !node.getRight().getIsFile()){
             
-            r = presentWorkingDirectoryHelper(node.getRight(), s);
+            r = presentWorkingDirectoryHelper(node.getRight(), path, nameToFind);
             if(r.contains(" ")){
                 return r;
             }
             }
         }
         return "";
+        
+    }
+    
+    /**
+     * A method which moves the cursor up to its parent directory, or does 
+     * nothing if at the cursor
+     * 
+     * Postcondition:
+     * The cursor has moved up a directory or is at the root
+     */
+    public void moveUp(){
+        if(cursor.getName().equals("root")){
+            return;
+        }
+        moveUpHelper(root,root);
+        
+    }
+    
+    /**
+     * A recursive helper method for finding the parent node of the cursor, and 
+     * moving the cursor to point to its parent
+     * 
+     * @param parent
+     * The parent node of the current node
+     * 
+     * @param current 
+     * The current node we are referencing in the pre-order traversal
+     * 
+     * Postcondition:
+     * The cursor has moved up a directory or is at the root
+     */
+    private void moveUpHelper(DirectoryNode parent, DirectoryNode current){
+        if(current.getName().equals(cursor.getName())){
+            cursor=parent;
+            return;
+        }
+        if(current.getLeft()!=null && !current.getLeft().getIsFile()){
+            moveUpHelper(current,current.getLeft());
+        }
+        if(current.getMiddle()!=null && !current.getMiddle().getIsFile()){
+            moveUpHelper(current,current.getMiddle());
+        }
+        if(current.getRight()!=null && !current.getRight().getIsFile()){
+            moveUpHelper(current,current.getRight());
+        }
         
     }
     
