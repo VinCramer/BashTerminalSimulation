@@ -36,9 +36,7 @@ public class DirectoryTree {
      * in by moving the cursor to the specified location.
      * 
      * @param name 
-     * The name of the directory the user wishes to access. For now, only 
-     * relative traversal works, but will soon have absolute paths as valid 
-     * arguments.
+     * The name of the directory the user wishes to access. 
      * 
      * Postcondition:
      * Cursor now points to the designated directory.
@@ -46,6 +44,10 @@ public class DirectoryTree {
     public void changeDirectory(String name){ 
         if(name.equals("/")){
             cursor=root;
+            return;
+        }
+        if(name.contains("/")){
+            absolutePathChangeDirectory(name);
             return;
         }
         
@@ -202,6 +204,52 @@ public class DirectoryTree {
             moveUpHelper(current,current.getRight());
         }
         
+    }
+    
+    /**
+     * A method which allows for the changing of paths if the user specified an 
+     * absolute path
+     * 
+     * @param path 
+     * The absolute path the user wishes to move the cursor to
+     * 
+     * Postcondition:
+     * Cursor now points to the final directory in the given path, or the 
+     * console displays an error message
+     */
+    public void absolutePathChangeDirectory(String path){
+        String[] arr = path.split("/");
+        
+        if(!arr[0].equals("root")){
+            System.out.println("Invalid path, no change to cursor.");
+            return;
+        }
+        if(arr[0].equals("root") && arr.length==1){
+            cursor=root;
+            return;
+        }
+        
+        DirectoryNode temp = root;
+        int i=1;
+        for(i=1;i<arr.length;i++){
+            if(temp.getLeft()!=null && !temp.getLeft().getIsFile() && 
+                    temp.getLeft().getName().equals(arr[i])){
+                temp=temp.getLeft();
+            }
+            else if(temp.getMiddle()!=null && !temp.getMiddle().getIsFile() && 
+                    temp.getMiddle().getName().equals(arr[i])){
+                temp=temp.getMiddle();
+            }
+            else if(temp.getRight()!=null && !temp.getRight().getIsFile() && 
+                    temp.getRight().getName().equals(arr[i])){
+                temp=temp.getRight();
+            }
+            else{
+                System.out.println("Path not found.");
+                break;
+            }
+        }
+        cursor=temp;
     }
     
     /**

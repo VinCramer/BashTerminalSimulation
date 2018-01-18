@@ -75,17 +75,17 @@ public class BashTerminalSimulation {
                 + "current pwd)");
         System.out.println("ls -R (prints entire tree in pre-order traversal)");
         System.out.println("cd {dir} (change directory to given directory, "
-                + "relative path only, brackets not required)");
+                + "and can use relative or absolute path)");
         System.out.println("cd / (change cursor to point at the root of the "
                 + "tree)");
+        System.out.println("cd .. (Moves the cursor up to its parent directory, "
+                + "and has no effect at root)");
         System.out.println("mkdir {name} (make a directory with some name, "
                 + "brackets not required)");
         System.out.println("touch {name} (make a file with some name, brackets "
                 + "not required)");
         System.out.println("find {name} (searches tree for node of same name, "
                 + "and prints path)");
-        System.out.println("cd .. (Moves the cursor up to its parent directory, "
-                + "and has no effect at root)");
         System.out.println("exit (terminates program)");   
         
     }
