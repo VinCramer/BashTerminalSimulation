@@ -36,6 +36,10 @@ public class BashTerminalSimulation {
             else if(command.equals("ls -R")){
                 tree.printDirectoryTree();
             }
+            else if(command.substring(0,2).equals("mv")){
+                String[] arr = command.split(" ");
+                tree.move(arr[1],arr[2]);
+            }
             else if(command.substring(0,2).equals("cd") && command.substring(3).equals("..")){
                 tree.moveUp();
             }
@@ -85,7 +89,10 @@ public class BashTerminalSimulation {
         System.out.println("touch {name} (make a file with some name, brackets "
                 + "not required)");
         System.out.println("find {name} (searches tree for node of same name, "
-                + "and prints path)");
+                + "and prints path, brackets not required)");
+        System.out.println("mv {source} {destination} (moves a file or "
+                + "directory from one absolute path to another, brackets not "
+                + "required)");
         System.out.println("exit (terminates program)");   
         
     }

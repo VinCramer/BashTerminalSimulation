@@ -84,6 +84,18 @@ public class DirectoryNode {
         return middle;
     }
     
+    public void setLeft(DirectoryNode node){
+        left=node;
+    }
+    
+    public void setMiddle(DirectoryNode node){
+        middle=node;
+    }
+    
+    public void setRight(DirectoryNode node){
+        right=node;
+    }
+    
     /**
      * A method which assigns the argument node to be a child of the method 
      * caller node. This method assigns children in a pre-order fashion, and 

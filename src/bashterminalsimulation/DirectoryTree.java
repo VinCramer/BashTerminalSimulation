@@ -252,6 +252,98 @@ public class DirectoryTree {
         cursor=temp;
     }
     
+    
+    public void move(String source, String destination){
+        //need to traverse to find node & node's parent for source, and newParent dest
+        if(destination.contains(".")){
+            System.out.println("Invalid destination.");
+            return;
+        }
+        /*parent is one level above the node we're moving. node is what will be 
+        moved. newParent is from the desintation argument, and will be one level
+        above its new child. temp is for traversal, and tempParent is for 
+        storing the parent, temporarily. All are initialized to root to appease 
+        the compiler's whims.
+        */
+        DirectoryNode parent=root, node=root, newParent=root, temp;
+        
+        String[] sourceArr = source.split("/");
+        String[] destArr = destination.split("/");
+        
+        String parentName = sourceArr[sourceArr.length-2];
+        String nodeName = sourceArr[sourceArr.length-1];
+        String newParentName = destArr[destArr.length-1];
+        
+        temp = root;
+        
+        int i;
+        for(i=1;i<sourceArr.length;i++){
+            if(temp.getName().equals(parentName)){
+                parent=temp;
+            }
+            /*
+            Never executing?
+            if(temp.getName().equals(nodeName)){
+                node=temp;
+            }*/
+            
+            if(temp.getLeft()!=null &&
+                    temp.getLeft().getName().equals(sourceArr[i])){
+                temp=temp.getLeft();
+            }
+            else if(temp.getMiddle()!=null && 
+                    temp.getMiddle().getName().equals(sourceArr[i])){
+                temp=temp.getMiddle();
+            }
+            else if(temp.getRight()!=null && 
+                    temp.getRight().getName().equals(sourceArr[i])){
+                temp=temp.getRight();
+            }
+            else{
+                System.out.println("Invalid source path.");
+                return;
+            }
+        }
+        
+        node=temp;
+        
+        
+        //3 cases - child is left, mid, or right
+        if(parent.getLeft().getName().equals(nodeName)){
+            parent.setLeft(null);
+        }
+        else if(parent.getMiddle().getName().equals(nodeName)){
+            parent.setMiddle(null);
+        }
+        else{
+            parent.setRight(null);
+        }
+        
+        //reset iterator for next loop
+        temp=root;
+        
+        for(i=1;i<destArr.length;i++){
+            if(temp.getLeft()!=null && !temp.getLeft().getIsFile() && 
+                    temp.getLeft().getName().equals(destArr[i])){
+                temp=temp.getLeft();
+            }
+            else if(temp.getMiddle()!=null && !temp.getMiddle().getIsFile() && 
+                    temp.getMiddle().getName().equals(destArr[i])){
+                temp=temp.getMiddle();
+            }
+            else if(temp.getRight()!=null && !temp.getRight().getIsFile() && 
+                    temp.getRight().getName().equals(destArr[i])){
+                temp=temp.getRight();
+            }
+            else{
+                System.out.println("Path not found.");
+                break;
+            }
+        }
+        
+        temp.addChild(node);
+    }
+    
     /**
      * Displays the names of children nodes of the cursor. 
      * 
