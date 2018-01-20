@@ -1,6 +1,8 @@
 
 package bashterminalsimulation;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Vincent Cramer
@@ -50,24 +52,19 @@ public class DirectoryTree {
             absolutePathChangeDirectory(name);
             return;
         }
+       
         
-        if(cursor.getLeft()!=null && name.equals(cursor.getLeft().getName()) 
-                && !cursor.getLeft().getIsFile()){
-            cursor=cursor.getLeft();
+        int i=0;
+        ArrayList<DirectoryNode> children = cursor.getChildren();
+        for(DirectoryNode n : children){
+            if(n.getName().equals(name) && !n.getIsFile()){
+                cursor=n;
+                return;
+            }
         }
-        else if(cursor.getMiddle()!=null && name.equals(cursor.getMiddle()
-                .getName()) 
-                && !cursor.getMiddle().getIsFile()){
-            cursor=cursor.getMiddle();
-        }
-        else if(cursor.getRight()!=null && name.equals(cursor.getRight()
-                .getName()) 
-                && !cursor.getRight().getIsFile()){
-            cursor=cursor.getRight();
-        }
-        else{
-            System.out.println("Invalid directory, cursor unchanged.");
-        }
+        
+        System.out.println("Invalid directory, cursor unchanged.");
+        
         
     }
     
@@ -129,33 +126,29 @@ public class DirectoryTree {
         }
         
         if(node.getName().equals(nameToFind)){
-            return path+node.getName() + " ";
+            return path + nameToFind + " ";
         }else{
             path+=node.getName()+"/"; 
             
-            String l, m, r;
-        if(node.getLeft()!=null && !node.getLeft().getIsFile()){
-                l=presentWorkingDirectoryHelper(node.getLeft(), path, 
-                        nameToFind);
-                if(l.contains(" ")){
-                    return l;
+            String returnedValue;
+            
+        ArrayList<DirectoryNode> children = node.getChildren();
+        int i=0;
+        for(i=0;i<children.size();i++){
+            if(!children.get(i).getIsFile()){
+                returnedValue = presentWorkingDirectoryHelper(children.get(i), 
+                        path, nameToFind);
+                if(returnedValue.contains(" ")){
+                    return returnedValue;
                 }
-        }
-        if(node.getMiddle()!=null && !node.getMiddle().getIsFile()){
-            
-            m = presentWorkingDirectoryHelper(node.getMiddle(), path, 
-                    nameToFind);
-            if(m.contains(" ")){
-                return m;
+            }
+            if(children.get(i).getIsFile() && nameToFind.contains(".")){
+                if(children.get(i).getName().equals(nameToFind)){
+                    return path + nameToFind + " ";
+                }
             }
         }
-        if(node.getRight()!=null && !node.getRight().getIsFile()){
-            
-            r = presentWorkingDirectoryHelper(node.getRight(), path, nameToFind);
-            if(r.contains(" ")){
-                return r;
-            }
-            }
+        
         }
         return "";
         
@@ -194,14 +187,13 @@ public class DirectoryTree {
             cursor=parent;
             return;
         }
-        if(current.getLeft()!=null && !current.getLeft().getIsFile()){
-            moveUpHelper(current,current.getLeft());
-        }
-        if(current.getMiddle()!=null && !current.getMiddle().getIsFile()){
-            moveUpHelper(current,current.getMiddle());
-        }
-        if(current.getRight()!=null && !current.getRight().getIsFile()){
-            moveUpHelper(current,current.getRight());
+        
+        ArrayList<DirectoryNode> children = current.getChildren();
+        int i=0;
+        for(i=0;i<children.size();i++){
+            if(!children.get(i).getIsFile()){
+                moveUpHelper(current,children.get(i));
+            }
         }
         
     }
@@ -232,40 +224,36 @@ public class DirectoryTree {
         DirectoryNode temp = root;
         int i=1;
         for(i=1;i<arr.length;i++){
-            if(temp.getLeft()!=null && !temp.getLeft().getIsFile() && 
-                    temp.getLeft().getName().equals(arr[i])){
-                temp=temp.getLeft();
+            
+            ArrayList<DirectoryNode> children = temp.getChildren();
+            
+            int j=0;
+            for(j=0;j<children.size();j++){
+                if(!children.get(j).getIsFile() && children.get(j).getName()
+                        .equals(arr[i])){
+                    temp=children.get(j);
+                //TODO: need some way of handling invalid entries    
+                }
             }
-            else if(temp.getMiddle()!=null && !temp.getMiddle().getIsFile() && 
-                    temp.getMiddle().getName().equals(arr[i])){
-                temp=temp.getMiddle();
-            }
-            else if(temp.getRight()!=null && !temp.getRight().getIsFile() && 
-                    temp.getRight().getName().equals(arr[i])){
-                temp=temp.getRight();
-            }
-            else{
-                System.out.println("Path not found.");
-                break;
-            }
+            
+            
         }
         cursor=temp;
     }
     
     
     public void move(String source, String destination){
-        //need to traverse to find node & node's parent for source, and newParent dest
+        
         if(destination.contains(".")){
             System.out.println("Invalid destination.");
             return;
         }
         /*parent is one level above the node we're moving. node is what will be 
-        moved. newParent is from the desintation argument, and will be one level
-        above its new child. temp is for traversal, and tempParent is for 
+        moved. temp is for traversal, and tempParent is for 
         storing the parent, temporarily. All are initialized to root to appease 
         the compiler's whims.
         */
-        DirectoryNode parent=root, node=root, newParent=root, temp;
+        DirectoryNode parent=root, node=root, temp;
         
         String[] sourceArr = source.split("/");
         String[] destArr = destination.split("/");
@@ -281,63 +269,38 @@ public class DirectoryTree {
             if(temp.getName().equals(parentName)){
                 parent=temp;
             }
-            /*
-            Never executing?
-            if(temp.getName().equals(nodeName)){
-                node=temp;
-            }*/
             
-            if(temp.getLeft()!=null &&
-                    temp.getLeft().getName().equals(sourceArr[i])){
-                temp=temp.getLeft();
-            }
-            else if(temp.getMiddle()!=null && 
-                    temp.getMiddle().getName().equals(sourceArr[i])){
-                temp=temp.getMiddle();
-            }
-            else if(temp.getRight()!=null && 
-                    temp.getRight().getName().equals(sourceArr[i])){
-                temp=temp.getRight();
-            }
-            else{
-                System.out.println("Invalid source path.");
-                return;
+            int j=0;
+            ArrayList<DirectoryNode> children = temp.getChildren();
+            for(j=0;j<children.size();j++){
+                if(children.get(j).getName().equals(sourceArr[i])){
+                    temp=children.get(j);
+                }
+                //TODO: need way of handling invalid cases
             }
         }
         
         node=temp;
         
-        
-        //3 cases - child is left, mid, or right
-        if(parent.getLeft().getName().equals(nodeName)){
-            parent.setLeft(null);
-        }
-        else if(parent.getMiddle().getName().equals(nodeName)){
-            parent.setMiddle(null);
-        }
-        else{
-            parent.setRight(null);
+        ArrayList<DirectoryNode> parentNodeChildren = parent.getChildren();
+        for(i=0;i<parentNodeChildren.size();i++){
+            if(parentNodeChildren.get(i).getName().equals(nodeName)){
+                parent.removeNthChild(i);
+                break;
+            }
         }
         
         //reset iterator for next loop
         temp=root;
         
         for(i=1;i<destArr.length;i++){
-            if(temp.getLeft()!=null && !temp.getLeft().getIsFile() && 
-                    temp.getLeft().getName().equals(destArr[i])){
-                temp=temp.getLeft();
-            }
-            else if(temp.getMiddle()!=null && !temp.getMiddle().getIsFile() && 
-                    temp.getMiddle().getName().equals(destArr[i])){
-                temp=temp.getMiddle();
-            }
-            else if(temp.getRight()!=null && !temp.getRight().getIsFile() && 
-                    temp.getRight().getName().equals(destArr[i])){
-                temp=temp.getRight();
-            }
-            else{
-                System.out.println("Path not found.");
-                break;
+            
+            ArrayList<DirectoryNode> children = temp.getChildren();
+            for(int j=0;j<children.size();j++){
+                if(!children.get(j).getIsFile() && children.get(j).getName()
+                        .equals(destArr[i])){
+                    temp=children.get(j);
+                }
             }
         }
         
@@ -353,14 +316,11 @@ public class DirectoryTree {
      */
     public String listDirectory(){
         String s = "";
-        if(cursor.getLeft()!=null){
-            s+=cursor.getLeft().getName() + " ";
-        }
-        if(cursor.getMiddle()!=null){
-            s+=cursor.getMiddle().getName() + " ";
-        }
-        if(cursor.getRight()!=null){
-            s+=cursor.getRight().getName();
+        
+        int i=0;
+        
+        for(i=0;i<cursor.getChildren().size();i++){
+            s+=((DirectoryNode)(cursor.getChildren().get(i))).getName() + " ";
         }
         return s;
     }
@@ -399,14 +359,11 @@ public class DirectoryTree {
             System.out.println(tabs + "-| " + node.getName());
         }
         
-        if(node.getLeft()!=null){
-            printDirectoryTreeHelper(node.getLeft(), tabs + "    ");
-        }
-        if(node.getMiddle()!=null){
-            printDirectoryTreeHelper(node.getMiddle(), tabs + "    ");
-        }
-        if(node.getRight()!=null){
-            printDirectoryTreeHelper(node.getRight(), tabs + "    ");
+        
+        int i=0;
+        ArrayList<DirectoryNode> children = node.getChildren();
+        for(i=0;i<children.size();i++){
+            printDirectoryTreeHelper(children.get(i), tabs+ "    ");
         }
     }
     
@@ -414,8 +371,7 @@ public class DirectoryTree {
      * A method which creates a directory as a child of the cursor, if possible.
      * 
      * Precondition:
-     * The directory name does not contain a space, slash, or period. Also, if 
-     * cursor has the maximum amount of children, another child won't be added.
+     * The directory name does not contain a space, slash, or period. 
      * 
      * @param name 
      * Name of the node that will potentially be added to the tree.
@@ -437,8 +393,7 @@ public class DirectoryTree {
      * A method which creates a file as a child of the cursor, if possible.
      * 
      * Precondition:
-     * The name does not have a space or slash. Also, if the cursor has the 
-     * maximum amount of children, another child won't be added.
+     * The name does not have a space or slash.
      * 
      * @param name 
      * Name of the node that will potentially be added to the tree.

@@ -1,6 +1,8 @@
 
 package bashterminalsimulation;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Vincent Cramer
@@ -8,8 +10,8 @@ package bashterminalsimulation;
 public class DirectoryNode {
     private String name;
     
-    //change to arraylist of nodes later for n-ary tree
-    private DirectoryNode left, middle, right;
+    //we'll treat position 0 as left, and size-1 as right
+    private ArrayList<DirectoryNode> children; 
     public boolean isFile;
     
     /**
@@ -31,6 +33,7 @@ public class DirectoryNode {
     public DirectoryNode(String name, boolean isFile){
         this.name=name;
         this.isFile=isFile;
+        children = new ArrayList();
     }
     
     
@@ -54,53 +57,12 @@ public class DirectoryNode {
         return isFile;
     }
     
-    /**
-     * Accessor for the left child of the current node
-     * 
-     * @return 
-     *  Left child node, or null if the child does not exist
-     */
-    public DirectoryNode getLeft(){
-        return left;
-    }
-    
-    /**
-     * Accessor for the right child of the current node
-     * 
-     * @return 
-     *  Right child node, or null if the child does not exist
-     */
-    public DirectoryNode getRight(){
-        return right;
-    }
-    
-    /**
-     * Accessor for the middle child of the current node
-     * 
-     * @return 
-     *  Middle child node, or null if the child does not exist
-     */
-    public DirectoryNode getMiddle(){
-        return middle;
-    }
-    
-    public void setLeft(DirectoryNode node){
-        left=node;
-    }
-    
-    public void setMiddle(DirectoryNode node){
-        middle=node;
-    }
-    
-    public void setRight(DirectoryNode node){
-        right=node;
-    }
-    
+
     /**
      * A method which assigns the argument node to be a child of the method 
-     * caller node. This method assigns children in a pre-order fashion, and 
-     * will not do anything if the current node cannot hold any references to 
-     * new children.
+     * caller node. This method assigns children in a pre-order fashion, with 
+     * left being the 0th position in the children array, and size-1 being the
+     * rightmost position
      * 
      * 
      * @param node 
@@ -108,27 +70,28 @@ public class DirectoryNode {
      * this method
      * 
      * Postcondition:
-     * If the caller node can spare a reference for the argument node, the 
-     * caller node will now reference said argument node. Otherwise, a message 
-     * will be printed to the console stating that this node can't have any more
-     * children.
+     * Argument node has been added a child to the caller node
      */
     public void addChild(DirectoryNode node){
         if(this.isFile){
             System.out.println("Cannot add children to file.");
             return;
         }
-        if(this.getLeft()==null){
-            left=node;
-        }
-        else if(this.getMiddle()==null){
-            middle=node;
-        }
-        else if(this.getRight()==null){
-            right=node;
-        }
-        else{
-            System.out.println("No room for children in this folder.");
-        }
+        
+        children.add(node);
+        //TODO: change method comments
     }
+    
+    public ArrayList getChildren(){
+        return children;
+    }
+    
+    public DirectoryNode getNthChild(int n){
+        return children.get(n);
+    }
+    
+    public void removeNthChild(int n){
+        children.remove(n);
+    }
+    
 }
