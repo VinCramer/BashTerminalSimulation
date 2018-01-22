@@ -51,7 +51,7 @@ public class DirectoryNode {
      * Accessor for the field indicating if node is a file or not
      * 
      * @return 
-     * THe boolean value indicating if the node is a file
+     * The boolean value indicating if the node is a file
      */
     public boolean getIsFile(){
         return isFile;
@@ -79,17 +79,30 @@ public class DirectoryNode {
         }
         
         children.add(node);
-        //TODO: change method comments
     }
-    
+
+    /**
+     * Accessor for the ArrayList containing all of the children of this node
+     * 
+     * @return 
+     * ArrayList of this node's children nodes
+     */
     public ArrayList getChildren(){
         return children;
     }
     
-    public DirectoryNode getNthChild(int n){
-        return children.get(n);
-    }
     
+    /**
+     * Method which removes 1 node from the ArrayList of children at current
+     * node
+     * 
+     * @param n 
+     * Position of node to remove in ArrayList
+     * 
+     * Postcondition:
+     * ArrayList of children is 1 element shorter, and the designated node has 
+     * been removed
+     */
     public void removeNthChild(int n){
         children.remove(n);
     }

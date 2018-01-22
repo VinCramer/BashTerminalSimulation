@@ -40,7 +40,8 @@ public class BashTerminalSimulation {
                 String[] arr = command.split(" ");
                 tree.move(arr[1],arr[2]);
             }
-            else if(command.substring(0,2).equals("cd") && command.substring(3).equals("..")){
+            else if(command.substring(0,2).equals("cd") && 
+                    command.substring(3).equals("..")){
                 tree.moveUp();
             }
             else if(command.substring(0,2).equals("cd")){
@@ -67,7 +68,7 @@ public class BashTerminalSimulation {
     }
     
     /**
-     * Prints available commands for the user. Called on each loop itertion
+     * Prints available commands for the user. Called on each loop iteration
      * 
      * Postcondition:
      *  Available commands have been printed to the console
@@ -79,20 +80,17 @@ public class BashTerminalSimulation {
                 + "current pwd)");
         System.out.println("ls -R (prints entire tree in pre-order traversal)");
         System.out.println("cd {dir} (change directory to given directory, "
-                + "and can use relative or absolute path)");
+                + "and the command supports relative and absolute paths)");
         System.out.println("cd / (change cursor to point at the root of the "
                 + "tree)");
         System.out.println("cd .. (Moves the cursor up to its parent directory, "
                 + "and has no effect at root)");
-        System.out.println("mkdir {name} (make a directory with some name, "
-                + "brackets not required)");
-        System.out.println("touch {name} (make a file with some name, brackets "
-                + "not required)");
+        System.out.println("mkdir {name} (make a directory with some name");
+        System.out.println("touch {name} (make a file with some name");
         System.out.println("find {name} (searches tree for node of same name, "
-                + "and prints path, brackets not required)");
+                + "and prints its path");
         System.out.println("mv {source} {destination} (moves a file or "
-                + "directory from one absolute path to another, brackets not "
-                + "required)");
+                + "directory from one absolute path to another");
         System.out.println("exit (terminates program)");   
         
     }

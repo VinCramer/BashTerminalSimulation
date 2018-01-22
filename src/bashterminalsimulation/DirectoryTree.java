@@ -54,7 +54,7 @@ public class DirectoryTree {
         }
        
         
-        int i=0;
+        
         ArrayList<DirectoryNode> children = cursor.getChildren();
         for(DirectoryNode n : children){
             if(n.getName().equals(name) && !n.getIsFile()){
@@ -117,8 +117,15 @@ public class DirectoryTree {
     private String presentWorkingDirectoryHelper(DirectoryNode node, 
             String path, String nameToFind){
 
-        //we use space as a token to see if we've found the cursor node
-        if(path.contains(" ")){
+        /*
+        Originally, a space was used as a token to see if we have already found 
+        the path, but upon further research it appears Unix allows space in 
+        filenames under certain circumstances. Thus, this method has been 
+        updated to use the null character instead.
+        */
+        
+        
+        if(path.contains("\0")){
             return path;
         }
         if(node==null){
@@ -126,7 +133,7 @@ public class DirectoryTree {
         }
         
         if(node.getName().equals(nameToFind)){
-            return path + nameToFind + " ";
+            return path + nameToFind + "\0";
         }else{
             path+=node.getName()+"/"; 
             
@@ -138,13 +145,13 @@ public class DirectoryTree {
             if(!children.get(i).getIsFile()){
                 returnedValue = presentWorkingDirectoryHelper(children.get(i), 
                         path, nameToFind);
-                if(returnedValue.contains(" ")){
+                if(returnedValue.contains("\0")){
                     return returnedValue;
                 }
             }
             if(children.get(i).getIsFile() && nameToFind.contains(".")){
                 if(children.get(i).getName().equals(nameToFind)){
-                    return path + nameToFind + " ";
+                    return path + nameToFind + "\0";
                 }
             }
         }
@@ -223,8 +230,9 @@ public class DirectoryTree {
         
         DirectoryNode temp = root;
         int i=1;
+        boolean found;
         for(i=1;i<arr.length;i++){
-            
+            found=false;
             ArrayList<DirectoryNode> children = temp.getChildren();
             
             int j=0;
@@ -232,16 +240,37 @@ public class DirectoryTree {
                 if(!children.get(j).getIsFile() && children.get(j).getName()
                         .equals(arr[i])){
                     temp=children.get(j);
-                //TODO: need some way of handling invalid entries    
+                    found=true;
                 }
             }
-            
+            if(!found){
+                System.out.println("Path not found.");
+                return;
+            }
             
         }
         cursor=temp;
     }
     
-    
+    /**
+     * A method which moves one file or directory from a given source path to a 
+     * given destination path
+     * 
+     * Precondition:
+     * Both the source and destination paths exist, and the file or directory 
+     * being moved does not have the same name as another file or directory in 
+     * the directory it will be moved to
+     * 
+     * @param source
+     * The source path of the node that will be moved
+     * 
+     * @param destination 
+     * The source path where the node will wind up
+     * 
+     * Postcondition:
+     * The node has been moved, or the user has been informed about why it was 
+     * not moved
+     */
     public void move(String source, String destination){
         
         if(destination.contains(".")){
@@ -253,19 +282,20 @@ public class DirectoryTree {
         storing the parent, temporarily. All are initialized to root to appease 
         the compiler's whims.
         */
-        DirectoryNode parent=root, node=root, temp;
+        DirectoryNode parent=root, node, temp;
         
         String[] sourceArr = source.split("/");
         String[] destArr = destination.split("/");
         
         String parentName = sourceArr[sourceArr.length-2];
         String nodeName = sourceArr[sourceArr.length-1];
-        String newParentName = destArr[destArr.length-1];
         
         temp = root;
         
         int i;
+        boolean found;
         for(i=1;i<sourceArr.length;i++){
+            found=false;
             if(temp.getName().equals(parentName)){
                 parent=temp;
             }
@@ -275,8 +305,13 @@ public class DirectoryTree {
             for(j=0;j<children.size();j++){
                 if(children.get(j).getName().equals(sourceArr[i])){
                     temp=children.get(j);
+                    found=true;
                 }
-                //TODO: need way of handling invalid cases
+                
+            }
+            if(!found){
+                System.out.println("Invalid source path");
+                return;
             }
         }
         
@@ -294,13 +329,27 @@ public class DirectoryTree {
         temp=root;
         
         for(i=1;i<destArr.length;i++){
-            
+            found=false;
             ArrayList<DirectoryNode> children = temp.getChildren();
             for(int j=0;j<children.size();j++){
                 if(!children.get(j).getIsFile() && children.get(j).getName()
                         .equals(destArr[i])){
                     temp=children.get(j);
+                    found=true;
                 }
+            }
+            if(!found){
+                System.out.println("Invalid destination path");
+                return;
+            }
+        }
+        
+        for(Object o : temp.getChildren()){
+            if(((DirectoryNode)o).getName().equals(node.getName())){
+                System.out.println("This simulation does not handle files or "
+                        + "directories of the same name in the same "
+                        + "directory.");
+                return;
             }
         }
         
@@ -371,7 +420,9 @@ public class DirectoryTree {
      * A method which creates a directory as a child of the cursor, if possible.
      * 
      * Precondition:
-     * The directory name does not contain a space, slash, or period. 
+     * The directory name does not contain a null character, slash, or period. 
+     * Additionally, the given name is not the same as the name of any other 
+     * nodes that are children of the cursor. 
      * 
      * @param name 
      * Name of the node that will potentially be added to the tree.
@@ -381,9 +432,16 @@ public class DirectoryTree {
      * not added.
      */
     public void makeDirectory(String name){
-        if(name.contains(" ") || name.contains("/")||name.contains(".")){
+        if(name.contains("\0") || name.contains("/")||name.contains(".")){
             System.out.println("Invalid directory name");
             return;
+        }
+        for (Object o : cursor.getChildren()){
+            if(((DirectoryNode)o).getName().equals(name)){
+                System.out.println("This simulation does not handle drectories"
+                        + " of the same name in the same directory.");
+                return;
+            }
         }
         DirectoryNode newNode = new DirectoryNode(name,false);
         cursor.addChild(newNode);
@@ -393,7 +451,9 @@ public class DirectoryTree {
      * A method which creates a file as a child of the cursor, if possible.
      * 
      * Precondition:
-     * The name does not have a space or slash.
+     * The name does not have a null character or slash. Additionally, the given
+     * name is not the same as the name of any other nodes that are children of 
+     * the cursor. 
      * 
      * @param name 
      * Name of the node that will potentially be added to the tree.
@@ -403,9 +463,16 @@ public class DirectoryTree {
      * not added.
      */
     public void makeFile(String name){
-        if(name.contains(" ") || name.contains("/")){
+        if(name.contains("\0") || name.contains("/")){
             System.out.println("Invalid directory name");
             return;
+        }
+        for (Object o : cursor.getChildren()){
+            if(((DirectoryNode)o).getName().equals(name)){
+                System.out.println("This simulation does not handle files of "
+                        + "the same name in the same directory.");
+                return;
+            }
         }
         DirectoryNode newNode = new DirectoryNode(name,true);
         cursor.addChild(newNode);
