@@ -1,4 +1,7 @@
 # BashTerminalSimulation
+
+This program is based off of a Stony Brook University CSE 214 homework, provided by Professor Ahmad Esmaili (https://www.cs.stonybrook.edu/people/faculty/AhmadEsmaili).
+
 A Java program simulating a Bash shell, using a tree-based data structure. Originally designed with a ternary tree, it has since been updated to be an n-ary tree, or a tree that supports any conceivable number of nodes on each level after the root.
 
 # Available functions:
@@ -27,5 +30,6 @@ mv {source} {destination} (moves a file or directory from one absolute path to a
 Example: mv root/dev/filea.txt root/bin
 
 exit (terminates program)
+
 
 One thing to note is that this simulation does not support having children nodes with the same names in the same directories, and this affects the mv, mkdir, and touch commands. Additionally, find will only find the first instance of a file or directory found in preorder traversal.
